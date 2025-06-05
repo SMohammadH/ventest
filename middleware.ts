@@ -3,7 +3,6 @@ import {
   updateUserSessionExpiration,
 } from '@/auth/core/session'
 import { NextResponse, type NextRequest } from 'next/server'
-import { run } from 'node:test'
 
 const privateRoutes = ['/private']
 const adminRoutes = ['/admin']

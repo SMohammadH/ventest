@@ -15,6 +15,7 @@ export default async function HomePage() {
 
   return (
     <div className='container mx-auto p-4'>
+      <h1 className='text-4xl'>Venture</h1>
       {fullUser == null ? (
         <div className='flex gap-4'>
           <Button asChild>
