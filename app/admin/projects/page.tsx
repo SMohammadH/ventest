@@ -16,6 +16,15 @@ import {
 import Link from 'next/link'
 import { eq } from 'drizzle-orm'
 import { ProjectTableRow } from './project-table-row'
+import { Input } from '@/components/ui/input'
+import { Search } from 'lucide-react'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 type ProjectWithRelations = {
   id: string
@@ -99,33 +108,80 @@ export default async function ProjectsPage() {
   const projects = await getProjects()
 
   return (
-    <div className='container mx-auto py-10'>
-      <div className='flex justify-between items-center mb-8'>
+    <div className='container mx-auto space-y-8'>
+      <div className='flex justify-between items-center'>
         <h1 className='text-3xl font-bold'>Projects</h1>
         <Button asChild>
           <Link href='/admin/projects/add'>Add Project</Link>
         </Button>
       </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Address</TableHead>
-            <TableHead>Customer</TableHead>
-            <TableHead>Expert</TableHead>
-            <TableHead>Buildings</TableHead>
-            <TableHead>Created At</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {projects.map((project) => (
-            <ProjectTableRow
-              key={project.id}
-              project={project}
-            />
-          ))}
-        </TableBody>
-      </Table>
+
+      <div className='flex items-center gap-4 mb-6'>
+        <div className='relative flex-1'>
+          <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
+          <Input
+            placeholder='Search projects...'
+            className='pl-8'
+          />
+        </div>
+        <Select defaultValue='all'>
+          <SelectTrigger className='w-[180px]'>
+            <SelectValue placeholder='Filter by status' />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value='all'>All Projects</SelectItem>
+            <SelectItem value='active'>Active</SelectItem>
+            <SelectItem value='completed'>Completed</SelectItem>
+            <SelectItem value='pending'>Pending</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className='rounded-md border'>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Address</TableHead>
+              <TableHead>Customer</TableHead>
+              <TableHead>Expert</TableHead>
+              <TableHead>Buildings</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Created At</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {projects.map((project) => (
+              <ProjectTableRow
+                key={project.id}
+                project={project}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      <div className='flex items-center justify-between'>
+        <div className='text-sm text-muted-foreground'>
+          Showing {projects.length} projects
+        </div>
+        <div className='flex items-center gap-2'>
+          <Button
+            variant='outline'
+            size='sm'
+            disabled
+          >
+            Previous
+          </Button>
+          <Button
+            variant='outline'
+            size='sm'
+            disabled
+          >
+            Next
+          </Button>
+        </div>
+      </div>
     </div>
   )
 }

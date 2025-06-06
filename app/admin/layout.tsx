@@ -13,7 +13,7 @@ export default function AdminLayout({
       <div className='hidden md:flex h-full w-72 flex-col fixed inset-y-0'>
         <div className='flex h-full flex-col border-r bg-background'>
           <div className='p-6'>
-            <h1 className='text-lg font-semibold'>Admin Panel</h1>
+            <h1 className='text-3xl font-semibold'>Ventures</h1>
           </div>
           <Sidebar />
         </div>
