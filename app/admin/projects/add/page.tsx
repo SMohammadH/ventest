@@ -21,6 +21,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -50,8 +52,10 @@ type Expert = {
 }
 
 export default function AddProjectPage() {
+  const router = useRouter()
   const [customers, setCustomers] = useState<Customer[]>([])
   const [experts, setExperts] = useState<Expert[]>([])
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -90,6 +94,7 @@ export default function AddProjectPage() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      setIsSubmitting(true)
       const response = await fetch('/api/projects', {
         method: 'POST',
         headers: {
@@ -103,10 +108,15 @@ export default function AddProjectPage() {
       }
 
       form.reset()
-      // You might want to add a success notification here
+      toast.success('Project created successfully')
+
+      router.push('/admin/projects')
+      router.refresh()
     } catch (error) {
       console.error('Error creating project:', error)
-      // You might want to add an error notification here
+      toast.error('Failed to create project. Please try again.')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -210,7 +220,12 @@ export default function AddProjectPage() {
               </FormItem>
             )}
           />
-          <Button type='submit'>Create Project</Button>
+          <Button
+            type='submit'
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Creating...' : 'Create Project'}
+          </Button>
         </form>
       </Form>
     </div>

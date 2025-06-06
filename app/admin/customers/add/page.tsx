@@ -15,6 +15,9 @@ import {
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { addCustomer } from './actions'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
+import { useState } from 'react'
 
 const formSchema = z.object({
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
@@ -25,6 +28,8 @@ const formSchema = z.object({
 })
 
 export default function AddCustomerPage() {
+  const router = useRouter()
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -38,11 +43,16 @@ export default function AddCustomerPage() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      setIsSubmitting(true)
       await addCustomer(values)
       form.reset()
-      alert('Customer added successfully!')
+      toast.success('Customer added successfully')
+      router.push('/admin/customers')
+      router.refresh()
     } catch (error) {
-      alert('Failed to add customer. Please try again.')
+      toast.error('Failed to add customer. Please try again.')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -139,7 +149,12 @@ export default function AddCustomerPage() {
                   </FormItem>
                 )}
               />
-              <Button type='submit'>Add Customer</Button>
+              <Button
+                type='submit'
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Adding...' : 'Add Customer'}
+              </Button>
             </form>
           </Form>
         </CardContent>

@@ -24,6 +24,9 @@ import { Card, CardContent } from '@/components/ui/card'
 import { addBuilding } from './actions'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
+import { useState } from 'react'
 
 const constructionTypes = [
   'Steel Frame',
@@ -53,6 +56,8 @@ export default function AddBuildingPage({
 }: {
   params: { id: string }
 }) {
+  const router = useRouter()
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -65,11 +70,16 @@ export default function AddBuildingPage({
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      setIsSubmitting(true)
       await addBuilding({ ...values, projectId: params.id })
       form.reset()
-      alert('Building added successfully!')
-    } catch {
-      alert('Failed to add building. Please try again.')
+      toast.success('Building added successfully')
+      router.push(`/admin/projects/${params.id}/buildings`)
+      router.refresh()
+    } catch (error) {
+      toast.error('Failed to add building. Please try again.')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -176,7 +186,12 @@ export default function AddBuildingPage({
                   </FormItem>
                 )}
               />
-              <Button type='submit'>Add Building</Button>
+              <Button
+                type='submit'
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Adding...' : 'Add Building'}
+              </Button>
             </form>
           </Form>
         </CardContent>

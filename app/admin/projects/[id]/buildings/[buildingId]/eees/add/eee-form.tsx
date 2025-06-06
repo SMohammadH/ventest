@@ -23,6 +23,8 @@ import {
 import { Card, CardContent } from '@/components/ui/card'
 import { addEee } from './actions'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
+import { useState } from 'react'
 
 const eeeTypes = [
   'Balcony',
@@ -57,6 +59,7 @@ export function EeeForm({
   numberOfFloors,
 }: EeeFormProps) {
   const router = useRouter()
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -69,11 +72,16 @@ export function EeeForm({
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      setIsSubmitting(true)
       await addEee({ ...values, buildingId })
+      form.reset()
+      toast.success('EEE added successfully')
       router.push(`/admin/projects/${projectId}/buildings/${buildingId}/eees`)
       router.refresh()
-    } catch {
-      alert('Failed to add EEE. Please try again.')
+    } catch (error) {
+      toast.error('Failed to add EEE. Please try again.')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -165,7 +173,12 @@ export function EeeForm({
                 </FormItem>
               )}
             />
-            <Button type='submit'>Add EEE</Button>
+            <Button
+              type='submit'
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Adding...' : 'Add EEE'}
+            </Button>
           </form>
         </Form>
       </CardContent>

@@ -15,6 +15,9 @@ import {
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { addExpert } from './actions'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
+import { useState } from 'react'
 
 const formSchema = z.object({
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
@@ -24,6 +27,8 @@ const formSchema = z.object({
 })
 
 export default function AddExpertPage() {
+  const router = useRouter()
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -35,15 +40,18 @@ export default function AddExpertPage() {
   })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log('Form submitted with values:', values)
     try {
-      const result = await addExpert(values)
-      console.log('Add expert result:', result)
+      setIsSubmitting(true)
+      await addExpert(values)
       form.reset()
-      alert('Expert added successfully! An invitation email has been sent.')
+      toast.success('Expert added successfully')
+      router.push('/admin/experts')
+      router.refresh()
     } catch (error) {
       console.error('Error adding expert:', error)
-      alert('Failed to add expert. Please try again.')
+      toast.error('Failed to add expert. Please try again.')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -124,7 +132,12 @@ export default function AddExpertPage() {
                   </FormItem>
                 )}
               />
-              <Button type='submit'>Add Expert</Button>
+              <Button
+                type='submit'
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Adding...' : 'Add Expert'}
+              </Button>
             </form>
           </Form>
         </CardContent>
