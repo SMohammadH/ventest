@@ -9,18 +9,20 @@ export default function AdminLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className='h-full relative'>
-      <div className='hidden h-full md:flex md:w-72 md:flex-col md:fixed md:inset-y-0 z-[80] bg-background'>
-        <div className='flex flex-col h-full'>
-          <div className='pl-6 pt-8'>
-            <h1 className='text-3xl font-bold'>Venture</h1>
+    <div className='flex h-screen'>
+      <div className='hidden md:flex h-full w-72 flex-col fixed inset-y-0'>
+        <div className='flex h-full flex-col border-r bg-background'>
+          <div className='p-6'>
+            <h1 className='text-lg font-semibold'>Admin Panel</h1>
           </div>
           <Sidebar />
         </div>
       </div>
-      <main className='md:pl-72'>
-        <div className='container mx-auto py-10'>
-          <Breadcrumb />
+      <main className='flex-1 md:pl-72'>
+        <div className='h-full p-8'>
+          <div className='mb-8'>
+            <Breadcrumb />
+          </div>
           {children}
         </div>
       </main>

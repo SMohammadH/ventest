@@ -2,16 +2,16 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
+  LayoutDashboard,
   Briefcase,
   Users,
   ClipboardList,
-  LayoutDashboard,
-  Settings,
   FileText,
+  Settings,
 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 const routes = [
   {
@@ -50,29 +50,32 @@ export function Sidebar() {
   const pathname = usePathname()
 
   return (
-    <div className='space-y-4 py-4 flex flex-col h-full bg-background text-primary'>
-      <div className='px-3 py-2 flex-1'>
-        <div className='space-y-1'>
-          {routes.map((route) => (
-            <Button
-              key={route.href}
-              variant={pathname === route.href ? 'secondary' : 'ghost'}
-              className={cn(
-                'w-full justify-start',
-                pathname === route.href
-                  ? 'bg-secondary text-secondary-foreground'
-                  : 'text-muted-foreground hover:text-primary hover:bg-secondary/50'
-              )}
-              asChild
-            >
-              <Link href={route.href}>
-                <route.icon className='mr-2 h-4 w-4' />
-                {route.label}
-              </Link>
-            </Button>
-          ))}
-        </div>
-      </div>
+    <div className='flex flex-col gap-2 p-4'>
+      {routes.map((route) => {
+        const isActive =
+          route.href === '/admin'
+            ? pathname === route.href
+            : pathname.startsWith(route.href)
+
+        return (
+          <Button
+            key={route.href}
+            asChild
+            variant={isActive ? 'secondary' : 'ghost'}
+            className={cn(
+              'w-full justify-start',
+              isActive
+                ? 'bg-secondary text-secondary-foreground'
+                : 'text-muted-foreground hover:text-primary hover:bg-secondary/50'
+            )}
+          >
+            <Link href={route.href}>
+              <route.icon className='mr-2 h-4 w-4' />
+              {route.label}
+            </Link>
+          </Button>
+        )
+      })}
     </div>
   )
 }

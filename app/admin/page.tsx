@@ -42,6 +42,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Progress } from '@/components/ui/progress'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 async function getStats() {
   const [
@@ -115,6 +116,7 @@ export default async function AdminPage() {
               <DropdownMenuItem>Project status updated</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          <ThemeToggle />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -260,7 +262,7 @@ export default async function AdminPage() {
                 className='w-full justify-start'
                 asChild
               >
-                <Link href='/admin/projects/new'>
+                <Link href='/admin/projects/add'>
                   <Briefcase className='mr-2 h-4 w-4' />
                   New Project
                 </Link>
@@ -270,7 +272,7 @@ export default async function AdminPage() {
                 variant='outline'
                 asChild
               >
-                <Link href='/admin/customers/new'>
+                <Link href='/admin/customers/add'>
                   <Users className='mr-2 h-4 w-4' />
                   Add Customer
                 </Link>
@@ -280,7 +282,7 @@ export default async function AdminPage() {
                 variant='outline'
                 asChild
               >
-                <Link href='/admin/experts/new'>
+                <Link href='/admin/experts/add'>
                   <ClipboardList className='mr-2 h-4 w-4' />
                   Add Expert
                 </Link>
