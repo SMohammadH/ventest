@@ -17,3 +17,48 @@ export const UserTable = pgTable('users', {
     .defaultNow()
     .$onUpdate(() => new Date()),
 })
+
+export const CustomerTable = pgTable('customers', {
+  id: uuid().primaryKey().defaultRandom(),
+  firstName: text().notNull(),
+  lastName: text().notNull(),
+  email: text().notNull().unique(),
+  phoneNumber: text(),
+  address: text(),
+  createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp({ withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+})
+
+export const ExpertTable = pgTable('experts', {
+  id: uuid().primaryKey().defaultRandom(),
+  firstName: text().notNull(),
+  lastName: text().notNull(),
+  email: text().notNull().unique(),
+  phoneNumber: text(),
+  status: text().notNull().default('pending'), // pending, active, inactive
+  createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp({ withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+})
+
+export const ProjectTable = pgTable('projects', {
+  id: uuid().primaryKey().defaultRandom(),
+  name: text().notNull(),
+  address: text().notNull(),
+  customerId: uuid()
+    .notNull()
+    .references(() => CustomerTable.id),
+  expertId: uuid()
+    .notNull()
+    .references(() => ExpertTable.id),
+  createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp({ withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+})
