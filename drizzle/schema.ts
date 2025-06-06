@@ -1,4 +1,11 @@
-import { pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
+import {
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+  integer,
+} from 'drizzle-orm/pg-core'
 
 export const userRoles = ['admin', 'expert'] as const
 export type UserRole = (typeof userRoles)[number]
@@ -61,4 +68,33 @@ export const ProjectTable = pgTable('projects', {
     .notNull()
     .defaultNow()
     .$onUpdate(() => new Date()),
+})
+
+export const BuildingTable = pgTable('buildings', {
+  id: uuid().primaryKey().defaultRandom(),
+  name: text().notNull(),
+  constructionType: text().notNull(),
+  numberOfFloors: integer().notNull(),
+  numberOfUnits: integer().notNull(),
+  projectId: uuid()
+    .notNull()
+    .references(() => ProjectTable.id),
+  createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp({ withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+})
+
+export const EeeTable = pgTable('eees', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(),
+  type: text('type').notNull(),
+  floor: integer('floor').notNull(),
+  unit: text('unit').notNull(),
+  buildingId: uuid('building_id')
+    .notNull()
+    .references(() => BuildingTable.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })

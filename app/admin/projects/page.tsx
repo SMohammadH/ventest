@@ -1,17 +1,40 @@
 import { db } from '@/drizzle/db'
-import { ProjectTable, CustomerTable, ExpertTable } from '@/drizzle/schema'
+import {
+  ProjectTable,
+  CustomerTable,
+  ExpertTable,
+  BuildingTable,
+} from '@/drizzle/schema'
+import { Button } from '@/components/ui/button'
 import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { eq } from 'drizzle-orm'
-import { Button } from '@/components/ui/button'
-import { Plus } from 'lucide-react'
 import Link from 'next/link'
+import { eq } from 'drizzle-orm'
+import { ProjectTableRow } from './project-table-row'
+
+type ProjectWithRelations = {
+  id: string
+  name: string
+  address: string
+  customer: {
+    firstName: string
+    lastName: string
+  } | null
+  expert: {
+    firstName: string
+    lastName: string
+  } | null
+  buildings: {
+    id: string
+    name: string
+  }[]
+  createdAt: Date
+}
 
 async function getProjects() {
   const projects = await db
@@ -19,7 +42,6 @@ async function getProjects() {
       id: ProjectTable.id,
       name: ProjectTable.name,
       address: ProjectTable.address,
-      createdAt: ProjectTable.createdAt,
       customer: {
         firstName: CustomerTable.firstName,
         lastName: CustomerTable.lastName,
@@ -28,29 +50,60 @@ async function getProjects() {
         firstName: ExpertTable.firstName,
         lastName: ExpertTable.lastName,
       },
+      buildings: {
+        id: BuildingTable.id,
+        name: BuildingTable.name,
+      },
+      createdAt: ProjectTable.createdAt,
     })
     .from(ProjectTable)
     .leftJoin(CustomerTable, eq(CustomerTable.id, ProjectTable.customerId))
     .leftJoin(ExpertTable, eq(ExpertTable.id, ProjectTable.expertId))
+    .leftJoin(BuildingTable, eq(BuildingTable.projectId, ProjectTable.id))
 
-  return projects
+  // Group buildings by project
+  const projectsWithBuildings = projects.reduce<ProjectWithRelations[]>(
+    (acc, project) => {
+      const existingProject = acc.find((p) => p.id === project.id)
+      if (existingProject) {
+        if (project.buildings?.id) {
+          existingProject.buildings.push({
+            id: project.buildings.id,
+            name: project.buildings.name,
+          })
+        }
+        return acc
+      }
+      return [
+        ...acc,
+        {
+          ...project,
+          buildings: project.buildings?.id
+            ? [
+                {
+                  id: project.buildings.id,
+                  name: project.buildings.name,
+                },
+              ]
+            : [],
+        },
+      ]
+    },
+    []
+  )
+
+  return projectsWithBuildings
 }
 
 export default async function ProjectsPage() {
   const projects = await getProjects()
 
   return (
-    <>
-      <div className='flex justify-between items-center mb-6'>
-        <h1 className='text-2xl font-bold'>Projects</h1>
+    <div className='container mx-auto py-10'>
+      <div className='flex justify-between items-center mb-8'>
+        <h1 className='text-3xl font-bold'>Projects</h1>
         <Button asChild>
-          <Link
-            href='/admin/projects/add'
-            className='flex items-center gap-2'
-          >
-            <Plus className='h-4 w-4' />
-            Add New Project
-          </Link>
+          <Link href='/admin/projects/add'>Add Project</Link>
         </Button>
       </div>
       <Table>
@@ -60,35 +113,19 @@ export default async function ProjectsPage() {
             <TableHead>Address</TableHead>
             <TableHead>Customer</TableHead>
             <TableHead>Expert</TableHead>
+            <TableHead>Buildings</TableHead>
             <TableHead>Created At</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {projects.map((project) => (
-            <TableRow
+            <ProjectTableRow
               key={project.id}
-              className='cursor-pointer hover:bg-muted/50'
-            >
-              <Link
-                href={`/admin/projects/${project.id}`}
-                className='contents'
-              >
-                <TableCell>{project.name}</TableCell>
-                <TableCell>{project.address}</TableCell>
-                <TableCell>
-                  {project.customer?.firstName} {project.customer?.lastName}
-                </TableCell>
-                <TableCell>
-                  {project.expert?.firstName} {project.expert?.lastName}
-                </TableCell>
-                <TableCell>
-                  {new Date(project.createdAt).toLocaleDateString()}
-                </TableCell>
-              </Link>
-            </TableRow>
+              project={project}
+            />
           ))}
         </TableBody>
       </Table>
-    </>
+    </div>
   )
 }

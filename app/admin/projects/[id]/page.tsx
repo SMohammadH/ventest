@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Building2 } from 'lucide-react'
 import Link from 'next/link'
 
 async function getProject(id: string) {
@@ -63,6 +63,15 @@ export default async function ProjectPage({
           </Link>
         </Button>
         <h1 className='text-2xl font-bold'>{project.name}</h1>
+        <Button asChild>
+          <Link
+            href={`/admin/projects/${params.id}/buildings`}
+            className='flex items-center gap-2'
+          >
+            <Building2 className='h-4 w-4' />
+            Buildings
+          </Link>
+        </Button>
       </div>
 
       <div className='grid gap-6'>
