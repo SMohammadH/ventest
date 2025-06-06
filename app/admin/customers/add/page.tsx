@@ -50,7 +50,7 @@ export default function AddCustomerPage() {
       router.push('/admin/customers')
       router.refresh()
     } catch (error) {
-      toast.error('Failed to add customer. Please try again.')
+      toast.error('Failed to add customer. Please try again.' + error)
     } finally {
       setIsSubmitting(false)
     }

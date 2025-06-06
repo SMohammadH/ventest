@@ -26,7 +26,7 @@ import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { useState } from 'react'
+import { use, useState } from 'react'
 
 const constructionTypes = [
   'Steel Frame',
@@ -54,8 +54,9 @@ const formSchema = z.object({
 export default function AddBuildingPage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
+  const { id } = use(params)
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const form = useForm<z.infer<typeof formSchema>>({
@@ -71,13 +72,13 @@ export default function AddBuildingPage({
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setIsSubmitting(true)
-      await addBuilding({ ...values, projectId: params.id })
+      await addBuilding({ ...values, projectId: id })
       form.reset()
       toast.success('Building added successfully')
-      router.push(`/admin/projects/${params.id}/buildings`)
+      router.push(`/admin/projects/${id}/buildings`)
       router.refresh()
     } catch (error) {
-      toast.error('Failed to add building. Please try again.')
+      toast.error('Failed to add building. Please try again.' + error)
     } finally {
       setIsSubmitting(false)
     }
@@ -91,7 +92,7 @@ export default function AddBuildingPage({
           size='icon'
           asChild
         >
-          <Link href={`/admin/projects/${params.id}/buildings`}>
+          <Link href={`/admin/projects/${id}/buildings`}>
             <ArrowLeft className='h-4 w-4' />
           </Link>
         </Button>

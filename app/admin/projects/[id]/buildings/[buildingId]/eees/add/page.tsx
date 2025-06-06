@@ -1,7 +1,6 @@
 import { db } from '@/drizzle/db'
 import { BuildingTable } from '@/drizzle/schema'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import Link from 'next/link'
 import { eq } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
@@ -20,9 +19,11 @@ async function getBuilding(id: string) {
 export default async function AddEeePage({
   params,
 }: {
-  params: { id: string; buildingId: string }
+  params: Promise<{ id: string; buildingId: string }>
 }) {
-  const building = await getBuilding(params.buildingId)
+  const { id, buildingId } = await params
+
+  const building = await getBuilding(buildingId)
   if (!building) notFound()
 
   return (
@@ -33,16 +34,14 @@ export default async function AddEeePage({
           variant='outline'
           asChild
         >
-          <Link
-            href={`/admin/projects/${params.id}/buildings/${params.buildingId}/eees`}
-          >
+          <Link href={`/admin/projects/${id}/buildings/${buildingId}/eees`}>
             Back to EEEs
           </Link>
         </Button>
       </div>
       <EeeForm
-        projectId={params.id}
-        buildingId={params.buildingId}
+        projectId={id}
+        buildingId={buildingId}
         numberOfFloors={building.numberOfFloors}
       />
     </div>

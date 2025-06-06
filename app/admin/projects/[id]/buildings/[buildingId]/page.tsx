@@ -18,9 +18,10 @@ async function getBuilding(id: string) {
 export default async function BuildingPage({
   params,
 }: {
-  params: { id: string; buildingId: string }
+  params: Promise<{ id: string; buildingId: string }>
 }) {
-  const building = await getBuilding(params.buildingId)
+  const { id, buildingId } = await params
+  const building = await getBuilding(buildingId)
   if (!building) notFound()
 
   return (
@@ -32,14 +33,12 @@ export default async function BuildingPage({
             variant='outline'
             asChild
           >
-            <Link href={`/admin/projects/${params.id}/buildings`}>
+            <Link href={`/admin/projects/${id}/buildings`}>
               Back to Buildings
             </Link>
           </Button>
           <Button asChild>
-            <Link
-              href={`/admin/projects/${params.id}/buildings/${params.buildingId}/eees`}
-            >
+            <Link href={`/admin/projects/${id}/buildings/${buildingId}/eees`}>
               View EEEs
             </Link>
           </Button>

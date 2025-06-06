@@ -79,7 +79,7 @@ export function EeeForm({
       router.push(`/admin/projects/${projectId}/buildings/${buildingId}/eees`)
       router.refresh()
     } catch (error) {
-      toast.error('Failed to add EEE. Please try again.')
+      toast.error('Failed to add EEE. Please try again.' + error)
     } finally {
       setIsSubmitting(false)
     }

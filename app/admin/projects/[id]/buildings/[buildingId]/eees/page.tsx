@@ -35,12 +35,13 @@ async function getEees(buildingId: string) {
 export default async function EeesPage({
   params,
 }: {
-  params: { id: string; buildingId: string }
+  params: Promise<{ id: string; buildingId: string }>
 }) {
-  const building = await getBuilding(params.buildingId)
+  const { id, buildingId } = await params
+  const building = await getBuilding(buildingId)
   if (!building) notFound()
 
-  const eees = await getEees(params.buildingId)
+  const eees = await getEees(buildingId)
 
   return (
     <div className='container mx-auto py-10'>
@@ -49,9 +50,7 @@ export default async function EeesPage({
           Exterior Elevated Elements - {building.name}
         </h1>
         <Button asChild>
-          <Link
-            href={`/admin/projects/${params.id}/buildings/${params.buildingId}/eees/add`}
-          >
+          <Link href={`/admin/projects/${id}/buildings/${buildingId}/eees/add`}>
             Add EEE
           </Link>
         </Button>
@@ -71,8 +70,8 @@ export default async function EeesPage({
             <EeeRow
               key={eee.id}
               eee={eee}
-              projectId={params.id}
-              buildingId={params.buildingId}
+              projectId={id}
+              buildingId={buildingId}
             />
           ))}
         </TableBody>

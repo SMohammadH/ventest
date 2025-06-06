@@ -61,9 +61,10 @@ async function getProject(id: string) {
 export default async function ProjectPage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
-  const project = await getProject(params.id)
+  const { id } = await params
+  const project = await getProject(id)
 
   return (
     <div className='container mx-auto space-y-8 py-8'>

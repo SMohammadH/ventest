@@ -24,18 +24,17 @@ async function getBuildings(projectId: string) {
 export default async function BuildingsPage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
-  const buildings = await getBuildings(params.id)
+  const { id } = await params
+  const buildings = await getBuildings(id)
 
   return (
     <div className='container mx-auto py-10'>
       <div className='flex justify-between items-center mb-8'>
         <h1 className='text-3xl font-bold'>Buildings</h1>
         <Button asChild>
-          <Link href={`/admin/projects/${params.id}/buildings/add`}>
-            Add Building
-          </Link>
+          <Link href={`/admin/projects/${id}/buildings/add`}>Add Building</Link>
         </Button>
       </div>
       <Table>
@@ -53,7 +52,7 @@ export default async function BuildingsPage({
             <BuildingRow
               key={building.id}
               building={building}
-              projectId={params.id}
+              projectId={id}
             />
           ))}
         </TableBody>
