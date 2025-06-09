@@ -15,6 +15,41 @@
       "when": 1749126019926,
       "tag": "0001_slow_peter_parker",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1749206930646,
+      "tag": "0002_bouncy_justin_hammer",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1749207563866,
+      "tag": "0003_glorious_edwin_jarvis",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1749209106961,
+      "tag": "0004_regular_jack_murdock",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1749215280358,
+      "tag": "0005_flippant_rachel_grey",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1749217396445,
+      "tag": "0006_needy_rumiko_fujikawa",
+      "breakpoints": true
     }
   ]
 }
