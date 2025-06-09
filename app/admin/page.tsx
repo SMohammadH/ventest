@@ -43,8 +43,11 @@ import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Progress } from '@/components/ui/progress'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { LogOutButton } from '../components/auth/LogOutButton'
+import { getCurrentUser } from '@/auth/next/currentUser'
 
 async function getStats() {
+  const user = await getCurrentUser({ redirectIfNotFound: true })
   const [
     totalProjects,
     totalCustomers,
@@ -64,6 +67,7 @@ async function getStats() {
         customerName: sql<string>`concat(${CustomerTable.firstName}, ' ', ${CustomerTable.lastName})`,
       })
       .from(ProjectTable)
+      .where(eq(ProjectTable.createdBy, user.id))
       .leftJoin(CustomerTable, eq(ProjectTable.customerId, CustomerTable.id))
       .orderBy(desc(ProjectTable.createdAt))
       .limit(5),
@@ -132,6 +136,10 @@ export default async function AdminPage() {
               <DropdownMenuItem>Profile</DropdownMenuItem>
               <DropdownMenuItem>Preferences</DropdownMenuItem>
               <DropdownMenuItem>Help</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <LogOutButton />
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

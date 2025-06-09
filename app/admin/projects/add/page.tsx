@@ -23,6 +23,7 @@ import {
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { createProject } from './actions'
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -95,23 +96,10 @@ export default function AddProjectPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setIsSubmitting(true)
-      const response = await fetch('/api/projects', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to create project')
-      }
-
+      await createProject(values)
       form.reset()
       toast.success('Project created successfully')
-
       router.push('/admin/projects')
-      router.refresh()
     } catch (error) {
       console.error('Error creating project:', error)
       toast.error('Failed to create project. Please try again.')

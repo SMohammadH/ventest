@@ -1,15 +1,14 @@
 'use client'
 
 import { logOut } from '@/auth/next/actions'
-import { Button } from '@/components/ui/button'
 
 export function LogOutButton() {
   return (
-    <Button
-      variant='destructive'
+    <div
+      className='cursor-pointer'
       onClick={async () => await logOut()}
     >
       Log Out
-    </Button>
+    </div>
   )
 }

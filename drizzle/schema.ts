@@ -1,3 +1,4 @@
+import { relations } from 'drizzle-orm'
 import {
   pgEnum,
   pgTable,
@@ -25,8 +26,19 @@ export const UserTable = pgTable('users', {
     .$onUpdate(() => new Date()),
 })
 
+export const userRelations = relations(
+  UserTable,
+  ({ many }: { many: any }) => ({
+    customers: many(CustomerTable),
+    projects: many(ProjectTable),
+  })
+)
+
 export const CustomerTable = pgTable('customers', {
   id: uuid().primaryKey().defaultRandom(),
+  createdBy: uuid()
+    .notNull()
+    .references(() => UserTable.id),
   firstName: text().notNull(),
   lastName: text().notNull(),
   email: text().notNull().unique(),
@@ -38,6 +50,17 @@ export const CustomerTable = pgTable('customers', {
     .defaultNow()
     .$onUpdate(() => new Date()),
 })
+
+export const customerRelations = relations(
+  CustomerTable,
+  ({ one, many }: { one: any; many: any }) => ({
+    creator: one(UserTable, {
+      fields: [CustomerTable.createdBy],
+      references: [UserTable.id],
+    }),
+    projects: many(ProjectTable),
+  })
+)
 
 export const ExpertTable = pgTable('experts', {
   id: uuid().primaryKey().defaultRandom(),
@@ -53,10 +76,20 @@ export const ExpertTable = pgTable('experts', {
     .$onUpdate(() => new Date()),
 })
 
+export const expertRelations = relations(
+  ExpertTable,
+  ({ many }: { one: any; many: any }) => ({
+    projects: many(ProjectTable),
+  })
+)
+
 export const ProjectTable = pgTable('projects', {
   id: uuid().primaryKey().defaultRandom(),
   name: text().notNull(),
   address: text().notNull(),
+  createdBy: uuid()
+    .notNull()
+    .references(() => UserTable.id),
   customerId: uuid()
     .notNull()
     .references(() => CustomerTable.id),
@@ -69,6 +102,25 @@ export const ProjectTable = pgTable('projects', {
     .defaultNow()
     .$onUpdate(() => new Date()),
 })
+
+export const projectRelations = relations(
+  ProjectTable,
+  ({ one, many }: { one: any; many: any }) => ({
+    creator: one(UserTable, {
+      fields: [ProjectTable.createdBy],
+      references: [UserTable.id],
+    }),
+    customer: one(CustomerTable, {
+      fields: [ProjectTable.customerId],
+      references: [CustomerTable.id],
+    }),
+    expert: one(ExpertTable, {
+      fields: [ProjectTable.expertId],
+      references: [ExpertTable.id],
+    }),
+    buildings: many(BuildingTable),
+  })
+)
 
 export const BuildingTable = pgTable('buildings', {
   id: uuid().primaryKey().defaultRandom(),
@@ -86,6 +138,17 @@ export const BuildingTable = pgTable('buildings', {
     .$onUpdate(() => new Date()),
 })
 
+export const buildingRelations = relations(
+  BuildingTable,
+  ({ one, many }: { one: any; many: any }) => ({
+    project: one(ProjectTable, {
+      fields: [BuildingTable.projectId],
+      references: [ProjectTable.id],
+    }),
+    eees: many(EeeTable),
+  })
+)
+
 export const EeeTable = pgTable('eees', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
@@ -98,3 +161,10 @@ export const EeeTable = pgTable('eees', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })
+
+export const eeeRelations = relations(EeeTable, ({ one }: { one: any }) => ({
+  building: one(BuildingTable, {
+    fields: [EeeTable.buildingId],
+    references: [BuildingTable.id],
+  }),
+}))

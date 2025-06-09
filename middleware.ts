@@ -22,14 +22,20 @@ export async function middleware(request: NextRequest) {
 
 async function middlewareAuth(request: NextRequest) {
   if (privateRoutes.includes(request.nextUrl.pathname)) {
-    const user = await getUserFromSession(request.cookies)
+    const user = await getUserFromSession({
+      get: (key) => request.cookies.get(key),
+      delete: (key) => request.cookies.delete(key),
+    })
     if (user == null) {
       return NextResponse.redirect(new URL('/sign-in', request.url))
     }
   }
 
   if (adminRoutes.includes(request.nextUrl.pathname)) {
-    const user = await getUserFromSession(request.cookies)
+    const user = await getUserFromSession({
+      get: (key) => request.cookies.get(key),
+      delete: (key) => request.cookies.delete(key),
+    })
     if (user == null) {
       return NextResponse.redirect(new URL('/sign-in', request.url))
     }

@@ -1,6 +1,9 @@
 import { userRoles } from '@/drizzle/schema'
 import { z } from 'zod'
 import { redisClient } from '@/redis/redis'
+import { db } from '@/drizzle/db'
+import { eq } from 'drizzle-orm'
+import { UserTable } from '@/drizzle/schema'
 
 const SESSION_EXPIRATION_SECONDS = 60 * 60 * 24 * 7
 const COOKIE_SESSION_KEY = 'session-id'
@@ -26,11 +29,27 @@ export type Cookies = {
   delete: (key: string) => void
 }
 
-export function getUserFromSession(cookies: Pick<Cookies, 'get'>) {
+export async function getUserFromSession(
+  cookies: Pick<Cookies, 'get' | 'delete'>
+) {
   const sessionId = cookies.get(COOKIE_SESSION_KEY)?.value
   if (sessionId == null) return null
 
-  return getUserSessionById(sessionId)
+  const user = await getUserSessionById(sessionId)
+  if (user == null) return null
+
+  // Check if user still exists in database
+  const dbUser = await db.query.UserTable.findFirst({
+    where: eq(UserTable.id, user.id),
+  })
+
+  if (dbUser == null) {
+    // User no longer exists in database, remove their session
+    await removeUserFromSession(cookies)
+    return null
+  }
+
+  return user
 }
 
 export async function updateUserSessionData(
